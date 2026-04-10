@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard - My Budget</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+/* ------------------- GENERAL ------------------- */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    background: #eef3f9;
+}
+
+/* ------------------- SIDEBAR ------------------- */
+.sidebar {
+    width: 270px;
+    background: linear-gradient(180deg, #001f4d, #002f80);
+    color: white;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar .welcome {
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
+.sidebar a {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+    margin: 12px 0;
+    transition: 0.3s;
+}
+
+.sidebar a:hover {
+    color: #ffd700;
+    padding-left: 6px;
+}
+
+/* ------------------- MAIN CONTENT ------------------- */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 15px 25px;
+    height: 100vh;
+}
+
+/* Website Name */
+.website-name {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: #002b5c;
+    margin-bottom: 10px;
+}
+
+/* ------------------- SUMMARY BAR ------------------- */
+.summary-bar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.summary-item {
+    background: white;
+    border-radius: 10px;
+    padding: 10px;
+    width: 23%;
+    text-align: center;
+    border: 1px solid #d6e2f0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.summary-item h3 {
+    margin: 0;
+    font-size: 14px;
+    color: #555;
+}
+
+.summary-item p {
+    margin: 5px 0 0 0;
+    font-size: 17px;
+    font-weight: bold;
+    color: #002b5c;
+}
+
+/* ------------------- CHART SECTION ------------------- */
+.charts-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: calc(100vh - 200px); /* ensures line chart is visible */
+}
+
+/* TOP: Pie + Donut */
+.top-charts {
+    display: flex;
+    gap: 10px;
+    height: 45%;
+}
+
+/* Equal size pie & donut */
+.pie-box,
+.donut-box {
+    flex: 1;
+    height: 100%;
+}
+
+/* Bottom Line Chart */
+.bottom-chart {
+    height: 55%;
+}
+
+.line-box {
+    height: 100%;
+}
+
+/* Chart Box */
+.chart-box {
+    background: white;
+    border: 3px solid #c5d3e6;
+    border-radius: 10px;
+    margin: 5px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Make charts fit nicely */
+.chart-box canvas {
+    width: 85% !important;
+    height: 85% !important;
+}
+
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="welcome">Welcome, {{ session['name'] }}</div>
+    <a href="{{ url_for('profile') }}">Manage Profile</a>
+    <a href="{{url_for('expenses')}}">Add Expense</a>
+    <a href="{{ url_for('income') }}">Add Income</a>
+    <a href="{{ url_for('report') }}">Generate / View Report</a>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</div>
+
+<div class="main-content">
+    <div class="website-name">My Budget: Personal Expense Tracker</div>
+
+    <div class="summary-bar">
+        <div class="summary-item">
+            <h3>Total Income</h3>
+            <p>₹{{ total_income }}</p>
+        </div>
+        <div class="summary-item">
+            <h3>Budget</h3>
+            <p>₹{{ budget }}</p>
+        </div>
+        <div class="summary-item">
+            <h3>Total Expenses</h3>
+            <p>₹{{ total_expense }}</p>
+        </div>
+        <div class="summary-item">
+            <h3>Remaining</h3>
+            <p>₹{{ remaining }}</p>
+        </div>
+    </div>
+
+    <div class="charts">
+        <div class="top-left">
+            <canvas id="categoryChart"></canvas>
+        </div>
+        <div class="top-right">
+            <canvas id="remainingChart"></canvas>
+        </div>
+        <div class="bottom-full">
+            <canvas id="weeklyChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    const categories = {{ categories | tojson | safe }};
+    const category_values = {{ category_values | tojson | safe }};
+    const remaining_val = {{ remaining | tojson | safe }};
+    const total_expense_val = {{ total_expense | tojson | safe }};
+    const dates = {{ months | tojson | safe }};
+    const weekly_totals = {{ monthly_totals | tojson | safe }};
+    const total_income_val = {{ total_income | tojson | safe }};
+
+    // Pie Chart - Expenses by Category
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'pie',
+        data: {
+            labels: categories,
+            datasets: [{
+                data: category_values,
+                backgroundColor: ['#ff6384','#36a2eb','#ffce56','#4bc0c0','#9966ff','#ff9f40']
+            }]
+        },
+         options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: {
+        padding: 10
+    },
+    plugins: {
+        title: {
+            display: true,
+            text: 'Expenses by Category',
+            font: { size: 16 }
+        }
+    }
+}  });
+// Doughnut Chart - Remaining vs Expense
+new Chart(document.getElementById('remainingChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Spent', 'Remaining'],
+        datasets: [{
+            data: [total_expense_val, remaining_val],
+            backgroundColor: ['#ff6384', '#36a2eb']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+            padding: 10
+        },
+        plugins: {
+            title: {
+                display: true,
+                text: 'Budget Usage',
+                font: { size: 16 }
+            }
+        }
+    }
+});
+
+
+// Line Chart - Weekly Expenses
+new Chart(document.getElementById('weeklyChart'), {
+    type: 'line',
+    data: {
+        labels: dates,
+        datasets: [{
+            label: 'Expenses by Date',
+            data: weekly_totals,
+            borderColor: '#4bc0c0',
+            backgroundColor: 'rgba(75,192,192,0.2)',
+            fill: true,
+            tension: 0.3
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+            padding: 10
+        },
+        plugins: {
+            title: {
+                display: true,
+                text: 'Weekly Expenses by Date',
+                font: { size: 16 }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+    
+</script>
+
+</body>
+</html>

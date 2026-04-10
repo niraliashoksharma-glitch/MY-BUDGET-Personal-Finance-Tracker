@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Profile</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            background: #eef3f9;
+        }
+
+        .sidebar {
+            width: 270px;
+            background: linear-gradient(180deg, #001f4d, #002f80);
+            color: white;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar .welcome {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 40px;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            margin: 12px 0;
+        }
+
+        .sidebar a:hover {
+            color: #ffd700;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #002b5c;
+        }
+
+        .profile-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 500px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .btn-group {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .save-btn {
+            background: #002f80;
+            color: white;
+        }
+
+        .danger-btn {
+            background: #d9534f;
+            color: white;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <div class="welcome">Hello, {{ user.name }}</div>
+    <a href="/dashboard">Dashboard</a>
+     <a href="{{ url_for('profile') }}">Manage Profile</a>
+    <a href="{{url_for('expenses')}}">Add Expense</a>
+    <a href="{{ url_for('income') }}">Add Income</a>
+    <a href="{{ url_for('report') }}">Generate / View Report</a>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</div>
+
+<div class="main-content">
+
+    <div class="page-title">Manage Profile</div>
+
+    <div class="profile-container">
+        <form method="POST">
+
+            <div class="form-group">
+                <label>User ID</label>
+                <input type="text" value="{{ user.id }}" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" name="name" value="{{ user.name }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" value="{{ user.email }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Monthly Budget (₹)</label>
+                <input type="number" name="budget" value="{{ user.budget }}" required>
+            </div>
+
+            <hr>
+
+            <h3>Change Password</h3>
+
+            <div class="form-group">
+                <label>Current Password</label>
+                <input type="password" name="current_password">
+            </div>
+
+            <div class="form-group">
+                <label>New Password</label>
+                <input type="password" name="new_password">
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="save-btn">Save Changes</button>
+                <button type="button" class="danger-btn">Delete Account</button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>

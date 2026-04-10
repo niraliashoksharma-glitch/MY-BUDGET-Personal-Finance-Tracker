@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expense Report</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background: linear-gradient(180deg, #001f4d, #002f80);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        .sidebar .welcome {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .sidebar a:hover,
+        .sidebar .active {
+            background: #334155;
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            padding: 30px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        input {
+            padding: 10px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table th, table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        table th {
+            background: #f1f5f9;
+        }
+
+        .total-row {
+            font-weight: bold;
+            background: #e2e8f0;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="welcome">Welcome, {{ session.name }}</div>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/income">Income</a>
+        <a href="/expenses">Expenses</a>
+        <a href="/report" class="active">Report</a>
+        <a href="/profile">Manage Profile</a>
+        <a href="/logout">Logout</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+
+        <h2>Generate Expense Report</h2>
+
+        <!-- Date Selection -->
+        <div class="card">
+            <form method="POST">
+            From:   <input type="date" name="from_date" required><br><br>
+            To:    <input type="date" name="to_date" required><br><br>
+                <button type="submit">Generate / View Report</button>
+            </form>
+        </div>
+
+        {% if expenses %}
+
+        <!-- Report Table -->
+        <div class="card">
+            <h3>Report Results</h3>
+
+            <table>
+                <tr>
+                    <th>Amount</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                </tr>
+
+                {% for expense in expenses %}
+                <tr>
+                    <td>₹ {{ expense[0] }}</td>
+                    <td>{{ expense[1] }}</td>
+                    <td>{{ expense[2] }}</td>
+                </tr>
+                {% endfor %}
+
+                <tr class="total-row">
+                    <td colspan="3">Total: ₹ {{ total }}</td>
+                </tr>
+            </table>
+
+            <br>
+
+            <a href="/download_report?from_date={{ from_date }}&to_date={{ to_date }}">
+                <button>Download Report (Excel)</button>
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+</div>
+
+</body>
+</html>

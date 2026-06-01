@@ -64,6 +64,14 @@ The project aligns closely with use cases in data analysis, business intelligenc
 * Multi-user and role-based access
 * Integration with external financial APIs
 
+## Application Preview
+
+![Dashboard](screenshots/dashboard.png)
+![Expenses](screenshots/expense.png)
+![Income](screenshots/income.png)
+![Report](screenshots/export_report.png)
+![Login](screenshots/login.png)
+
 ## Author
 
 **Nirali Sharma**
